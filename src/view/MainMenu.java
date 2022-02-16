@@ -171,25 +171,38 @@ public class MainMenu {
         String firstName, lastName, phone, address, email, facebook;
         boolean firstNameValid, lastNameValid, phoneValid, emailValid;
 
-        Pattern emailPattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+        Pattern PHONE_PATTERN = Pattern.compile("0[\\d]{9}");
+        Pattern NAME_PATTERN = Pattern.compile("[\\w\\s]+");
+        Pattern EMAIL_PATTERN = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+
 
         do {
             System.out.print("Nhập họ (bắt buộc): ");
             firstName = scanner.nextLine();
-            firstNameValid = firstName.length() > 0;
+            Matcher matcher = NAME_PATTERN.matcher(firstName);
+            firstNameValid = matcher.matches();
+            if (!firstNameValid)
+                System.out.println("Nhập tên không hợp lệ");
+
         } while (!firstNameValid);
 
         do {
             System.out.print("Nhập tên (bắt buộc): ");
             lastName = scanner.nextLine();
-            lastNameValid = lastName.length() > 0;
+            Matcher matcher = NAME_PATTERN.matcher(lastName);
+            lastNameValid = matcher.matches();
+            if (!lastNameValid)
+                System.out.println("Nhập tên không hợp lệ");
         } while (!lastNameValid);
 
 
         do {
             System.out.print("Nhập số điện thoại (bắt buộc): ");
             phone = scanner.nextLine();
-            phoneValid = phone.length() > 0; /// phát triển thêm
+            Matcher matcher = PHONE_PATTERN.matcher(phone);
+            phoneValid = matcher.matches();
+            if (!phoneValid)
+                System.out.println("Số điện thoại có 10 chữ số, bắt đầu bằng số 0");
         } while (!phoneValid);
 
         System.out.print("Nhập địa chỉ (có thể bỏ trống):");
@@ -197,7 +210,7 @@ public class MainMenu {
         do {
             System.out.print("Nhập email (có thể bỏ trống):");
             email = scanner.nextLine();
-            Matcher matcher = emailPattern.matcher(email);
+            Matcher matcher = EMAIL_PATTERN.matcher(email);
             emailValid = email.length() == 0
                     || matcher.matches();
         } while (!emailValid);

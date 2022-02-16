@@ -9,6 +9,8 @@ import java.sql.SQLOutput;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MainMenu {
 
@@ -23,20 +25,20 @@ public class MainMenu {
     static final int OPTION_EXIT = 8;
     static final int OPTION_DEFAULT = -1;
 
-    public void run(){
+    public void run() {
         int choice;
         boolean exit;
         do {
             printMenu();
             try {
                 choice = scanner.nextInt();
-            } catch (InputMismatchException e){
+            } catch (InputMismatchException e) {
                 choice = OPTION_DEFAULT;
             } finally {
                 scanner.nextLine();
             }
 
-            switch (choice){
+            switch (choice) {
                 case OPTION_SHOW_ALL: {
                     PhoneBook.getInstance().printAllContacts();
                     break;
@@ -45,7 +47,7 @@ public class MainMenu {
                     showAddContact();
                     break;
                 }
-                case OPTION_UPDATE:{
+                case OPTION_UPDATE: {
                     showUpdateContact();
                     break;
                 }
@@ -63,7 +65,7 @@ public class MainMenu {
                     showReadFile();
                     break;
                 }
-                case OPTION_WRITE_FILE:{
+                case OPTION_WRITE_FILE: {
                     showWriteFile();
                     break;
                 }
@@ -79,9 +81,7 @@ public class MainMenu {
     }
 
 
-
-
-    public void printMenu(){
+    public void printMenu() {
         System.out.println("---- CHƯƠNG TRÌNH QUẢN LÝ DANH BẠ ----");
         System.out.println("1. Xem danh sách");
         System.out.println("2. Thêm mới");
@@ -101,12 +101,12 @@ public class MainMenu {
     }
 
 
-    private void showSearchContact(){
+    private void showSearchContact() {
         SearchMenu searchMenu = new SearchMenu();
         searchMenu.run();
         Contact searchResult = searchMenu.getSearchResult();
 
-        if (searchResult == null){
+        if (searchResult == null) {
             System.out.println("Không tìm thấy liên hệ!");
             return;
         }
@@ -116,12 +116,12 @@ public class MainMenu {
 
     }
 
-    private static void showUpdateContact(){
+    private static void showUpdateContact() {
         SearchMenu searchMenu = new SearchMenu();
         searchMenu.run();
         Contact searchResult = searchMenu.getSearchResult();
 
-        if (searchResult == null){
+        if (searchResult == null) {
             System.out.println("Không tìm thấy liên hệ!");
             return;
         }
@@ -131,12 +131,12 @@ public class MainMenu {
         System.out.println("Đã cập nhật thông tin!");
     }
 
-    private static void showDeleteContact(){
+    private static void showDeleteContact() {
         SearchMenu searchMenu = new SearchMenu();
         searchMenu.run();
         Contact searchResult = searchMenu.getSearchResult();
 
-        if (searchResult == null){
+        if (searchResult == null) {
             System.out.println("Không tìm thấy liên hệ!");
             return;
         }
@@ -145,13 +145,13 @@ public class MainMenu {
         System.out.println("Đã xóa liên hệ");
     }
 
-    private void showReadFile(){
+    private void showReadFile() {
         System.out.println("Thao tác sẽ xóa toàn bộ danh bạ hiện tại và cập nhật toàn bộ từ file có sẵn!!");
         System.out.println("Đồng ý chạy?   (Y / N)");
         String input = scanner.nextLine();
         char answer = input.charAt(0);
         char agree = 'y';
-        if (answer == agree){
+        if (answer == agree) {
             List<Contact> list = ReadFileService.readFile();
             PhoneBook.getInstance().clearList();
             PhoneBook.getInstance().add(list);
@@ -161,15 +161,17 @@ public class MainMenu {
         }
     }
 
-    public void showWriteFile(){
+    public void showWriteFile() {
         System.out.println("Ghi danh bạ ra file");
         WriteFileService.writeToFIle();
         System.out.println("Thao tác thành công.");
     }
 
-    private static Contact showInputContact(){
+    private static Contact showInputContact() {
         String firstName, lastName, phone, address, email, facebook;
-        boolean firstNameValid, lastNameValid, phoneValid;
+        boolean firstNameValid, lastNameValid, phoneValid, emailValid;
+
+        Pattern emailPattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 
         do {
             System.out.print("Nhập họ (bắt buộc): ");
@@ -192,8 +194,14 @@ public class MainMenu {
 
         System.out.print("Nhập địa chỉ (có thể bỏ trống):");
         address = scanner.nextLine();
-        System.out.print("Nhập email (có thể bỏ trống):");
-        email = scanner.nextLine();
+        do {
+            System.out.print("Nhập email (có thể bỏ trống):");
+            email = scanner.nextLine();
+            Matcher matcher = emailPattern.matcher(email);
+            emailValid = email.length() == 0
+                    || matcher.matches();
+        } while (!emailValid);
+
         System.out.print("Nhập facebook (có thể bỏ trống):");
         facebook = scanner.nextLine();
 
